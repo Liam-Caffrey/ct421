@@ -8,21 +8,11 @@ def generatepop(length, popsize):
     return ["".join(random.choice(["0", "1"]) for _ in range(length)) for _ in range(popsize)]
 
 
-# Fixed strategies 1-4 alternative method of seleciton of strategy made easier below
-#funcitons where a hold over from previous versions
-#def fixedstrat1():
-    #return "C"
-#def fixedstrat2():
-    #return "D"
-
 def fixedstrat3(lastinput):
     if lastinput == "C":
         return "D"
     else:
         return "C"
-
-#def fixedstrat4():
-    #return random.choice(['C', 'D'])
 
 
 def fixedstrat5(rounds=15):
@@ -33,14 +23,14 @@ def fixedstrat5(rounds=15):
 def getmymove(opmoves, strat):
     mymove = ""
 
-    last3 = opmoves[-3:] #based on the previous 3 moves
-    #convert last three moves into 1s and 0s
-    #0s if C and 1s if D
-    binarystr = ''.join(['0' if move == 'C' else '1' for move in last3])
-    #conver this binary sting to decimal
+    last5 = opmoves[-5:]  # Based on the previous 5 moves
+    # Convert last five moves into 1s and 0s
+    # 0s if C and 1s if D
+    binarystr = ''.join(['0' if move == 'C' else '1' for move in last5])
+    # Convert this binary string to decimal
     decimal = int(binarystr, 2)
     response = strat[decimal]
-    #allocated spot is the reponse
+    # Allocated spot is the response
     if response == "0" or response == 0:
         mymove = "C"
     else:
@@ -48,7 +38,8 @@ def getmymove(opmoves, strat):
 
     return mymove
 
-#----------------------------------------------------------gaem logic------------------------------------------------
+
+# ----------------------------------------------------------game logic------------------------------------------------
 def prisonersdilemma(mymove, opmove):
     if mymove == 'C' and opmove == 'C':
         return 3
@@ -108,14 +99,14 @@ def fitnessfunction(inputnum, population, rounds, strat, probablitynoise, random
     return score
 
 
-
 # ---------------------------------------------------------cross over---------------------------------------------------
 def crossover(parent1, parent2):
     point = random.randint(1, len(parent1) - 1)
     child = parent1[:point] + parent2[point:]
     return child
 
-# ---------------------------------------------------------mut---------------------------------------------------
+
+# ---------------------------------------------------------mutation---------------------------------------------------
 def mutation(bitstr, mutationRate=0.2):
     if random.random() < mutationRate:
         point = random.randint(0, len(bitstr) - 1)
@@ -124,16 +115,15 @@ def mutation(bitstr, mutationRate=0.2):
         return ''.join(bitstr)
     return bitstr
 
-# ---------------------------------------------------------selec---------------------------------------------------
-def selection(population, currentgenfit, elitismRate, tournamentSize):
 
+# ---------------------------------------------------------selection---------------------------------------------------
+def selection(population, currentgenfit, elitismRate, tournamentSize):
     noElite = int(len(population) * elitismRate)
     sortedindices = np.argsort(currentgenfit)[::-1]
     sortedpopulation = [population[i] for i in sortedindices]
 
     elites = sortedpopulation[:noElite]
     newpopulation = elites[:]
-
 
     noSelected = len(population) - noElite
     selected = []
@@ -143,7 +133,6 @@ def selection(population, currentgenfit, elitismRate, tournamentSize):
         tournament = [currentgenfit[i] for i in tournamentIndices]
         bestIndex = tournamentIndices[tournament.index(max(tournament))]
         selected.append(population[bestIndex])
-
 
     while len(newpopulation) < len(population):
         p1, p2 = random.choices(sortedpopulation, k=2)
@@ -155,7 +144,7 @@ def selection(population, currentgenfit, elitismRate, tournamentSize):
 
 
 # ---------------------------------------------------------main---------------------------------------------------
-length = 8
+length = 32  # 2^5 possible states
 popsize = 50
 currentGen = generatepop(length, popsize)
 currentGenFit = []
